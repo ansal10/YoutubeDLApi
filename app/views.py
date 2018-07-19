@@ -1,13 +1,11 @@
 import json
-from _ast import Dict, Tuple
+from _ast import Dict
+from datetime import datetime, timedelta
 
 import pytz
 from django.http import JsonResponse
-from pip._vendor.urllib3.contrib._securetransport.bindings import Boolean
 
 from libs import youtube_dl
-from datetime import datetime, time, timedelta
-from django.shortcuts import render
 
 expired_days = 30
 
@@ -15,7 +13,7 @@ expired_days = 30
 from app.models import Video
 
 
-def load_video_config(video_url: str) -> (Boolean, Video):
+def load_video_config(video_url: str) :
     video: Video = Video.objects.filter(video_url=video_url).first()
     if video and video.updated_at + timedelta(days=expired_days) > datetime.now(pytz.UTC):
         return False, video
