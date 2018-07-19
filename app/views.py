@@ -4,7 +4,7 @@ from _ast import Dict
 import pytz
 from django.http import JsonResponse
 
-from lib import youtube_dl
+from libs import youtube_dl
 from datetime import datetime, time, timedelta
 from django.shortcuts import render
 
