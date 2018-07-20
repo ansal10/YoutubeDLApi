@@ -10,7 +10,7 @@ from datetime import datetime, time, timedelta
 from django.shortcuts import render
 
 expired_hours_dict = {
-    'youtube': 6
+    'www.youtube.com': 6
 }
 
 # Create your views here.
@@ -19,7 +19,7 @@ from app.models import Video
 
 def load_video_config(video_url: str) -> Video:
     video: Video = Video.objects.filter(video_url=video_url).first()
-    site = urlparse(video_url).netloc.split(".")[0]
+    site = urlparse(video_url).netloc
     expire_hours = expired_hours_dict[site.lower()]
     if video and video.updated_at + timedelta(hours=expire_hours) > datetime.now(pytz.UTC):
         return video
