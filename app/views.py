@@ -1,5 +1,6 @@
 import json
 from _ast import Dict
+from urllib.parse import urlparse
 
 import pytz
 from django.http import JsonResponse
@@ -8,7 +9,9 @@ from libs import youtube_dl
 from datetime import datetime, time, timedelta
 from django.shortcuts import render
 
-expired_days = 30
+expired_hours_dict = {
+    'youtube': 6
+}
 
 # Create your views here.
 from app.models import Video
@@ -16,7 +19,9 @@ from app.models import Video
 
 def load_video_config(video_url: str) -> Video:
     video: Video = Video.objects.filter(video_url=video_url).first()
-    if video and video.updated_at + timedelta(days=expired_days) > datetime.now(pytz.UTC):
+    site = urlparse(video_url).netloc.split(".")[0]
+    expire_hours = expired_hours_dict[site.lower()]
+    if video and video.updated_at + timedelta(hours=expire_hours) > datetime.now(pytz.UTC):
         return video
     else:
         config = youtube_dl._real_main([video_url, "-F", "--no-check-certificate"])[0]
