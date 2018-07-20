@@ -8,13 +8,14 @@ from django.http import JsonResponse
 from libs import youtube_dl
 from datetime import datetime, time, timedelta
 from django.shortcuts import render
+from app.models import Video
 
 expired_hours_dict = {
-    'www.youtube.com': 6
+    'www.youtube.com': 6,
+    'youtube.com': 6
 }
 
 # Create your views here.
-from app.models import Video
 
 
 def load_video_config(video_url: str) -> Video:
