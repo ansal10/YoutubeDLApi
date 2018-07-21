@@ -25,6 +25,8 @@ def load_video_config(video_url: str) -> Video:
     if video and video.updated_at + timedelta(hours=expire_hours) > datetime.now(pytz.UTC):
         return video
     else:
+        if video:
+            video.delete()
         config = youtube_dl._real_main([video_url, "-F", "--no-check-certificate"])[0]
         config = json.dumps(config)
         video: Video = Video.objects.create(video_url=video_url, video_config=config)
