@@ -18,12 +18,12 @@ expired_hours_dict = {
 # Create your views here.
 
 
-def load_video_config(video_url: str) -> Video:
+def load_video_config(video_url: str) :
     video: Video = Video.objects.filter(video_url=video_url).first()
     site = urlparse(video_url).netloc
     expire_hours = expired_hours_dict[site.lower()]
     if video and video.updated_at + timedelta(hours=expire_hours) > datetime.now(pytz.UTC):
-        return video
+        pass
     else:
         if video:
             video.delete()
@@ -31,20 +31,27 @@ def load_video_config(video_url: str) -> Video:
         config = json.dumps(config)
         video: Video = Video.objects.create(video_url=video_url, video_config=config)
 
-    return video
+    expired_in = (video.updated_at + timedelta(hours=expire_hours) - datetime.now(pytz.UTC))
+    expired_in = expired_in.seconds + expired_in.days*60*60*24
+    return video, expired_in
 
 
 def video_config(request):
     data: Dict[str, str] = json.loads(request.body)
     video_url: str = data['video_url']
-    video: Video = load_video_config(video_url)
-    return JsonResponse({'data': json.loads(video.video_config)})
+    video, expired_in = load_video_config(video_url)
+    data = json.loads(video.video_config)
+    data['expired_in'] = expired_in
+    return JsonResponse({'data': data})
 
 
 def video_format(request):
     data: Dict[str, str] = json.loads(request.body)
     video_url: str = data['video_url']
-    video: Video = load_video_config(video_url)
-    config: Dict[str, str] = json.loads(video.video_config)
+    video, expired_in = load_video_config(video_url)
+    config = json.loads(video.video_config)
     formats = config.get('format') or config.get('formats')
+    for f in formats:
+        f['expired_in'] = expired_in
+
     return JsonResponse({'data': formats})
