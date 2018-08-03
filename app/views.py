@@ -1,4 +1,5 @@
 import json
+import zlib
 from _ast import Dict
 from urlparse import urlparse
 
@@ -12,6 +13,8 @@ from datetime import datetime, timedelta
 import time
 from django.shortcuts import render
 import yaml
+import gzip
+from StringIO import StringIO
 
 expired_hours_dict = {
     'www.youtube.com': 6,
@@ -61,9 +64,15 @@ def video_format(request):
 
 
 def proxy_video_config(request):
-    data = json.loads(request.body)
-    video_id = data.get('video_id')
     start_time = int(time.time() * 1000)
+
+    try:
+        data = json.loads(request.body)
+    except Exception as e:  # if content iz gzip enabled
+        s = gzip.GzipFile(fileobj=StringIO(request.body)).read()
+        data = json.loads(s)
+
+    video_id = data.get('video_id')
     video_url = "https://www.youtube.com/watch?v={}".format(video_id)
     bypass_data = data.get('bypass_data')
     config = youtube_dl._real_main([video_url, "-F", "--no-check-certificate", "--bypass-content", json.dumps(bypass_data)])[0]
