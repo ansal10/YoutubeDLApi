@@ -5,9 +5,11 @@ from urlparse import urlparse
 import pytz
 from django.http import JsonResponse
 
+from YoutubeDLApi.settings import youtubedl_logger
 from app.models import Video
 from libs import youtube_dl
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
+import time
 from django.shortcuts import render
 import yaml
 
@@ -61,7 +63,10 @@ def video_format(request):
 def proxy_video_config(request):
     data = json.loads(request.body)
     video_id = data.get('video_id')
+    start_time = int(time.time() * 1000)
     video_url = "https://www.youtube.com/watch?v={}".format(video_id)
     bypass_data = data.get('bypass_data')
     config = youtube_dl._real_main([video_url, "-F", "--no-check-certificate", "--bypass-content", json.dumps(bypass_data)])[0]
+    end_time = int(time.time() * 1000)
+    youtubedl_logger.info("Millis took: {}, video_url: {}".format((end_time-start_time), video_url))
     return JsonResponse({"data": config})

@@ -2240,10 +2240,7 @@ class YoutubeDL(object):
         if self.params.get('bypass_content', None):
             res = BypassContent().response(req._Request__original, self.params.get('bypass_content'))
         if not res:
-            print("Url Opening =====> " + req._Request__original)  # bypass here
             res = self._opener.open(req, timeout=self._socket_timeout)
-        else:
-            print("Url Bypassed =====> " + req._Request__original)  # bypass here
 
         return res
 

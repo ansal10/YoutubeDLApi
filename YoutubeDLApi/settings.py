@@ -122,3 +122,62 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            # 'format': '%(asctime)s %(levelname)-8s  %(module)s %(process)d - %(thread)d %(filename)s:%(lineno)-4d: %(message)s'
+            'format': '%(levelname)-8s %(filename)s:%(lineno)-4d: %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/tmp/logs/youtubedl.log',
+            'maxBytes': 1024 * 1024 * 50,  # 5 MB
+            'backupCount': 30,
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'youtubedl': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        # 'django_redis.cache': {
+        #     'handlers': ['console', 'file'],
+        #     'level': 'INFO'
+        # },
+        # 'binsock': {
+        #     'handlers': ['console', 'binsock_file'],
+        #     'level': 'INFO'
+        # },
+        # 'local_limit_worker': {
+        #     'handlers': ['console', 'local_limit_order_worker'],
+        #     'level': 'INFO'
+        # }
+
+    }
+}
+import logging
+youtubedl_logger = logging.getLogger('youtubedl')

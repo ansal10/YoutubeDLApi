@@ -3,6 +3,7 @@ import json
 import traceback
 from httplib import HTTPMessage
 from urllib import addinfourl
+from YoutubeDLApi.settings import youtubedl_logger
 
 class BypassContent(object):
 
@@ -21,9 +22,12 @@ class BypassContent(object):
                 code = 200
                 msg = 'OK'
                 res = addinfourl(fp, headers, url, code)
+                youtubedl_logger.info('Request Bypassed for url -> '+ url)
                 return res
             else:
+                youtubedl_logger.info('Request Skipped for url -> ' + url)
                 return None
         except Exception as e:
+            youtubedl_logger.info('Request Exception for url -> ' + url)
             traceback.print_exc()
             return None
