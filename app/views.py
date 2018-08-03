@@ -60,6 +60,7 @@ def video_format(request):
 def proxy_video_config(request):
     data = json.loads(request.body)
     video_id = data.get('video_id')
+    video_url = "https://www.youtube.com/watch?v={}".format(video_id)
     bypass_data = data.get('bypass_data')
-    config = youtube_dl._real_main([video_id, "-F", "--no-check-certificate", "--bypass-content", json.dumps(bypass_data)])[0]
+    config = youtube_dl._real_main([video_url, "-F", "--no-check-certificate", "--bypass-content", json.dumps(bypass_data)])[0]
     return JsonResponse({"data": config})
