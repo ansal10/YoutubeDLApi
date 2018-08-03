@@ -154,6 +154,10 @@ def parseOpts(overrideArguments=None):
         action='store_true', dest='dump_user_agent', default=False,
         help='Display the current browser identification')
     general.add_option(
+        '--bypass-content',
+        dest='bypass_content', default=None,
+        help='Content for urls that needs to be bypassed')
+    general.add_option(
         '--list-extractors',
         action='store_true', dest='list_extractors', default=False,
         help='List all supported extractors')

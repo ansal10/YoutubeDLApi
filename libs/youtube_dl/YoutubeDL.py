@@ -28,6 +28,7 @@ import random
 
 from string import ascii_letters
 
+from .bypass_content_util import BypassContent
 from .compat import (
     compat_basestring,
     compat_cookiejar,
@@ -2235,7 +2236,16 @@ class YoutubeDL(object):
         """ Start an HTTP download """
         if isinstance(req, compat_basestring):
             req = sanitized_Request(req)
-        return self._opener.open(req, timeout=self._socket_timeout)
+        res = None
+        if self.params.get('bypass_content', None):
+            res = BypassContent().response(req._Request__original, self.params.get('bypass_content'))
+        if not res:
+            print("Url Opening =====> " + req._Request__original)  # bypass here
+            res = self._opener.open(req, timeout=self._socket_timeout)
+        else:
+            print("Url Bypassed =====> " + req._Request__original)  # bypass here
+
+        return res
 
     def print_debug_header(self):
         if not self.params.get('verbose'):

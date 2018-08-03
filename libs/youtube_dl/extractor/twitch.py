@@ -27,6 +27,7 @@ from ..utils import (
     unified_timestamp,
     update_url_query,
     urlencode_postdata,
+    url_or_none,
     urljoin,
 )
 
@@ -239,7 +240,7 @@ class TwitchVodIE(TwitchItemBaseIE):
     _VALID_URL = r'''(?x)
                     https?://
                         (?:
-                            (?:(?:www|go|m)\.)?twitch\.tv/(?:[^/]+/v|videos)/|
+                            (?:(?:www|go|m)\.)?twitch\.tv/(?:[^/]+/v(?:ideo)?|videos)/|
                             player\.twitch\.tv/\?.*?\bvideo=v
                         )
                         (?P<id>\d+)
@@ -294,6 +295,9 @@ class TwitchVodIE(TwitchItemBaseIE):
         'only_matching': True,
     }, {
         'url': 'https://m.twitch.tv/beagsandjam/v/247478721',
+        'only_matching': True,
+    }, {
+        'url': 'https://www.twitch.tv/northernlion/video/291940395',
         'only_matching': True,
     }]
 
@@ -663,8 +667,8 @@ class TwitchClipsIE(TwitchBaseIE):
         for option in status['quality_options']:
             if not isinstance(option, dict):
                 continue
-            source = option.get('source')
-            if not source or not isinstance(source, compat_str):
+            source = url_or_none(option.get('source'))
+            if not source:
                 continue
             formats.append({
                 'url': source,

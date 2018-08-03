@@ -567,7 +567,6 @@ class InfoExtractor(object):
     def _request_webpage(self, url_or_request, video_id, note=None, errnote=None, fatal=True, data=None, headers={}, query={}, expected_status=None):
         """
         Return the response handle.
-
         See _download_webpage docstring for arguments specification.
         """
         if note is None:
@@ -628,7 +627,7 @@ class InfoExtractor(object):
         if urlh is False:
             assert not fatal
             return False
-        content = self._webpage_read_content(urlh, url_or_request, video_id, note, errnote, fatal, encoding=encoding)
+        content = self._webpage_read_content(urlh, url_or_request, video_id, note, errnote, fatal, encoding=encoding, )
         return (content, urlh)
 
     @staticmethod
@@ -639,11 +638,14 @@ class InfoExtractor(object):
         else:
             m = re.search(br'<meta[^>]+charset=[\'"]?([^\'")]+)[ /\'">]',
                           webpage_bytes[:1024])
-            if m:
-                encoding = m.group(1).decode('ascii')
-            elif webpage_bytes.startswith(b'\xff\xfe'):
-                encoding = 'utf-16'
-            else:
+            try:
+                if m:
+                    encoding = m.group(1).decode('ascii')
+                elif webpage_bytes.startswith(b'\xff\xfe'):
+                    encoding = 'utf-16'
+                else:
+                    encoding = 'utf-8'
+            except Exception as e:
                 encoding = 'utf-8'
 
         return encoding
@@ -677,6 +679,7 @@ class InfoExtractor(object):
                 expected=True)
 
     def _webpage_read_content(self, urlh, url_or_request, video_id, note=None, errnote=None, fatal=True, prefix=None, encoding=None):
+        print("Webpage read content ===> "+ urlh.url)
         content_type = urlh.headers.get('Content-Type', '')
         webpage_bytes = urlh.read()
         if prefix is not None:
@@ -1859,9 +1862,7 @@ class InfoExtractor(object):
                         'height': height,
                     })
                 formats.extend(m3u8_formats)
-                continue
-
-            if src_ext == 'f4m':
+            elif src_ext == 'f4m':
                 f4m_url = src_url
                 if not f4m_params:
                     f4m_params = {
@@ -1871,9 +1872,13 @@ class InfoExtractor(object):
                 f4m_url += '&' if '?' in f4m_url else '?'
                 f4m_url += compat_urllib_parse_urlencode(f4m_params)
                 formats.extend(self._extract_f4m_formats(f4m_url, video_id, f4m_id='hds', fatal=False))
-                continue
-
-            if src_url.startswith('http') and self._is_valid_url(src, video_id):
+            elif src_ext == 'mpd':
+                formats.extend(self._extract_mpd_formats(
+                    src_url, video_id, mpd_id='dash', fatal=False))
+            elif re.search(r'\.ism/[Mm]anifest', src_url):
+                formats.extend(self._extract_ism_formats(
+                    src_url, video_id, ism_id='mss', fatal=False))
+            elif src_url.startswith('http') and self._is_valid_url(src, video_id):
                 http_count += 1
                 formats.append({
                     'url': src_url,
@@ -1884,7 +1889,6 @@ class InfoExtractor(object):
                     'width': width,
                     'height': height,
                 })
-                continue
 
         return formats
 
