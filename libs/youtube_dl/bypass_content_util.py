@@ -4,7 +4,6 @@ import traceback
 from httplib import HTTPMessage
 from urllib import addinfourl
 
-
 class BypassContent(object):
 
     def response(self, url, bypass_content): # bypass_content: { url1: [content, headers],
@@ -12,7 +11,7 @@ class BypassContent(object):
             data = json.loads(bypass_content)
             if url in data:
                 d = data[url]
-                fp = io.StringIO(unicode(d[0], "utf-8"))
+                fp = io.BytesIO(d[0].encode('utf-8'))
                 headers = HTTPMessage(io.StringIO(unicode(d[1])), 0)
                 # for head in d[1].split("\n"):
                 #     xy = head.split(":")
