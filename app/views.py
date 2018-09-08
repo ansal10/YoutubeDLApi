@@ -63,6 +63,7 @@ def video_format(request):
     return JsonResponse({'data': formats})
 
 
+# TODO: load cached URL for and append to bypass data "https://www.youtube.com/yts/jsbin/player_ias-vflIVQ4xT/en_US/base.js?disable_polymer=true"
 def proxy_video_config(request):
     start_time = int(time.time() * 1000)
 

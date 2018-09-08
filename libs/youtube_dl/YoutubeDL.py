@@ -656,8 +656,6 @@ class YoutubeDL(object):
 
             outtmpl = self.params.get('outtmpl', DEFAULT_OUTTMPL)
 
-            # For fields playlist_index and autonumber convert all occurrences
-            # of %(field)s to %(field)0Nd for backward compatibility
             field_size_compat_map = {
                 'playlist_index': len(str(template_dict['n_entries'])),
                 'autonumber': autonumber_size,
