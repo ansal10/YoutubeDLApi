@@ -567,6 +567,7 @@ class InfoExtractor(object):
     def _request_webpage(self, url_or_request, video_id, note=None, errnote=None, fatal=True, data=None, headers={}, query={}, expected_status=None):
         """
         Return the response handle.
+
         See _download_webpage docstring for arguments specification.
         """
         if note is None:
@@ -627,7 +628,7 @@ class InfoExtractor(object):
         if urlh is False:
             assert not fatal
             return False
-        content = self._webpage_read_content(urlh, url_or_request, video_id, note, errnote, fatal, encoding=encoding, )
+        content = self._webpage_read_content(urlh, url_or_request, video_id, note, errnote, fatal, encoding=encoding)
         return (content, urlh)
 
     @staticmethod
@@ -638,14 +639,11 @@ class InfoExtractor(object):
         else:
             m = re.search(br'<meta[^>]+charset=[\'"]?([^\'")]+)[ /\'">]',
                           webpage_bytes[:1024])
-            try:
-                if m:
-                    encoding = m.group(1).decode('ascii')
-                elif webpage_bytes.startswith(b'\xff\xfe'):
-                    encoding = 'utf-16'
-                else:
-                    encoding = 'utf-8'
-            except Exception as e:
+            if m:
+                encoding = m.group(1).decode('ascii')
+            elif webpage_bytes.startswith(b'\xff\xfe'):
+                encoding = 'utf-16'
+            else:
                 encoding = 'utf-8'
 
         return encoding
@@ -679,7 +677,6 @@ class InfoExtractor(object):
                 expected=True)
 
     def _webpage_read_content(self, urlh, url_or_request, video_id, note=None, errnote=None, fatal=True, prefix=None, encoding=None):
-        print("Webpage read content ===> "+ urlh.url)
         content_type = urlh.headers.get('Content-Type', '')
         webpage_bytes = urlh.read()
         if prefix is not None:
