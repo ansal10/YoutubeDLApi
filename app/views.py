@@ -4,6 +4,7 @@ from _ast import Dict
 from urlparse import urlparse
 
 import pytz
+import requests
 from django.http import JsonResponse
 
 from YoutubeDLApi.settings import youtubedl_logger
@@ -21,7 +22,11 @@ expired_hours_dict = {
     'youtube.com': 6
 }
 
+url_dict = {}
+
 # Create your views here.
+
+
 
 
 def load_video_config(video_url) :
@@ -76,7 +81,19 @@ def proxy_video_config(request):
     video_id = data.get('video_id')
     video_url = "https://www.youtube.com/watch?v={}".format(video_id)
     bypass_data = data.get('bypass_data')
+    urls = get_urls_dict()
+    for url, data in urls.items():
+        bypass_data[url] = data
+
     config = youtube_dl._real_main([video_url, "-F", "--no-check-certificate", "--bypass-content", json.dumps(bypass_data)])[0]
     end_time = int(time.time() * 1000)
     youtubedl_logger.info("Millis took: {}, video_url: {}".format((end_time-start_time), video_url))
     return JsonResponse({"data": config})
+
+def get_urls_dict():
+    url1 = "https://www.youtube.com/yts/jsbin/player_ias-vflIVQ4xT/en_US/base.js?disable_polymer=true"
+    if not url_dict.get(url1):
+        url_dict[url1] = requests.get(url1).text
+        youtubedl_logger.info("Fetching JS player")
+
+    return url_dict
