@@ -80,7 +80,7 @@ def proxy_video_config(request):
 
     video_id = data.get('video_id')
     video_url = "https://www.youtube.com/watch?v={}".format(video_id)
-    bypass_data = data.get('bypass_data')
+    bypass_data = data.get('bypass_data', {})
     urls = get_urls_dict()
     for url, data in urls.items():
         bypass_data[url] = data
