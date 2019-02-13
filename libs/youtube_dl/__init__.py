@@ -434,7 +434,7 @@ def _real_main(argv=None):
         # just for deprecation check
         'autonumber': opts.autonumber if opts.autonumber is True else None,
         'usetitle': opts.usetitle if opts.usetitle is True else None,
-        'bypass_content': opts.bypass_content
+        'bypass_content': opts.bypass_content # YDL Changes
     }
 
     with YoutubeDL(ydl_opts) as ydl:
@@ -458,7 +458,7 @@ def _real_main(argv=None):
 
         try:
             if opts.load_info_filename is not None:
-                retcode = ydl.download_with_info_file(expand_path(opts.load_info_filename))
+                retcode = ydl.download_with_info_file(expand_path(opts.load_info_filename))  # YDL Changes
             else:
                 return ydl.download_return_info(all_urls)
         except MaxDownloadsReached:
