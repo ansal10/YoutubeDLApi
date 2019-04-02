@@ -5,3 +5,4 @@ pytz==2018.5
 PyYAML==3.13
 uWSGI==2.0.17.1
 requests
+lzstring

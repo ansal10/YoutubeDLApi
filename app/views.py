@@ -2,7 +2,7 @@ import json
 import zlib
 from _ast import Dict
 from urlparse import urlparse
-
+import lzstring
 import pytz
 import requests
 from django.http import JsonResponse
@@ -75,8 +75,13 @@ def proxy_video_config(request):
     try:
         data = json.loads(request.body)
     except Exception as e:  # if content iz gzip enabled
-        s = gzip.GzipFile(fileobj=StringIO(request.body)).read()
-        data = json.loads(s)
+        try:
+            s = gzip.GzipFile(fileobj=StringIO(request.body)).read()
+            data = json.loads(s)
+        except Exception as e:
+            data = lzstring.LZString.decompressFromBase64(request.body)
+            data = json.loads(data)
+
 
     video_id = data.get('video_id')
     video_url = "https://www.youtube.com/watch?v={}".format(video_id)
