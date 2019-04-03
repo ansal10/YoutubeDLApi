@@ -32,6 +32,6 @@ def proxy_video_config(request):
         }
     }
     data = json.dumps(data)
-    res = requests.post("http://localhost:5000/api/v1/urls/proxy_config", data=data, headers=headers)
+    res = requests.post("http://localhost:5005/api/v1/urls/proxy_config", data=data, headers=headers)
     youtubedl_logger.info("Response code is {}, text={}".format(res.status_code, res.text))
     return JsonResponse(json.loads(res.text))
