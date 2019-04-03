@@ -8,6 +8,8 @@ import lzstring
 import requests
 from django.http import JsonResponse
 
+from YoutubeDLApi.settings import youtubedl_logger
+
 
 def proxy_video_config(request):
     try:
@@ -21,4 +23,5 @@ def proxy_video_config(request):
             data = json.loads(data)
     headers = {'content-type': "application/json"}
     res = requests.post("http://localhost:5005/api/v1/urls/proxy_config", data=json.dumps(data), headers=headers)
+    youtubedl_logger.info("Response code is {}, text={}".format(res.status_code, res.text))
     return JsonResponse(json.loads(res.text))
